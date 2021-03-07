@@ -2,27 +2,22 @@
 
 namespace KirschbaumDevelopment\NovaComments\Nova;
 
-use Laravel\Nova\Panel;
 use Laravel\Nova\Resource;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use Laravel\Nova\Fields\Text;
-use Laravel\Nova\Fields\MorphTo;
+use Laravel\Nova\Fields\Select;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\Boolean;
-use Whitecube\NovaFlexibleContent\Flexible;
-use KirschbaumDevelopment\NovaComments\Models\Comment as CommentModel;
+use KirschbaumDevelopment\NovaComments\Models\Note as NoteModel;
 
-class Comment extends Resource
+class Note extends Resource
 {
     /**
      * The model the resource corresponds to.
      *
      * @var string
      */
-    public static $model = CommentModel::class;
+    public static $model = NoteModel::class;
 
     /**
      * The single value that should be used to represent the resource when being displayed.
@@ -37,7 +32,7 @@ class Comment extends Resource
      * @var array
      */
     public static $search = [
-        'comment',
+        'content', 'type',
     ];
 
     /**
@@ -49,45 +44,20 @@ class Comment extends Resource
      */
     public function fields(Request $request)
     {
-        $fields = [
-            Textarea::make('comment')
+        return [
+            Select::make('type')->options(NoteModel::getTypes()),
+
+            BelongsTo::make('User', 'user', config('nova-comments.commenter.nova-resource')),
+
+            Textarea::make('content')
                 ->alwaysShow()
                 ->hideFromIndex(),
-
-            MorphTo::make('Commentable')->onlyOnIndex(),
-
-            Text::make('comment')
-                ->displayUsing(function ($comment) {
-                    return Str::limit($comment, config('nova-comments.limit'));
-                })
-                ->onlyOnIndex(),
-
-            BelongsTo::make('Commenter', 'commenter', config('nova-comments.commenter.nova-resource'))
-                ->exceptOnForms(),
 
             DateTime::make('Created', 'created_at')
                 ->format(config('nova-comments.date-format'))
                 ->exceptOnForms()
                 ->sortable(),
         ];
-
-        if (config('nova-comments.supports-approval')) {
-            array_unshift($fields, Boolean::make("Is Approved"));
-        }
-
-        if (config('nova-comments.supports-reported-comments')) {
-            array_push($fields,  new Panel('Moderation', $this->moderationPanel()));
-        }
-
-        return $fields;
-    }
-
-    protected function moderationPanel()
-    {
-        $fields = [
-            HasMany::make("notes")
-        ];
-        return $fields;
     }
 
     /**

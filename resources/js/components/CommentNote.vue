@@ -1,11 +1,15 @@
 <template>
-  <div class="commenter__comment py-4 border-t border-40">
+  <div class="user__note py-4 border-t border-40">
     <div class="font-light text-80 text-sm">
-      <template v-if="hasCommenter">
+      <span :class="{
+            label: true,
+            'label-error label-danger': ['inappropriate'].indexOf(noteType.toLowerCase()) > -1
+        }">{{ noteType }}</span>
+      <template v-if="hasUser">
         <a
           class="no-underline dim text-primary font-bold"
-          :href="commenterUrl"
-          v-text="commenter"
+          :href="userUrl"
+          v-text="user"
         ></a>
 
         said
@@ -20,12 +24,8 @@
 
     <div
       class="mt-2"
-      v-html="commentString"
+      v-html="noteString"
     ></div>
-    <commenter-notes
-      v-if="showNotes"
-      :resource-id="comment.id"
-    />
   </div>
 </template>
 
@@ -34,32 +34,34 @@
 
 export default {
   props: {
-    comment: {
+    note: {
       type: Object,
       required: true,
     },
   },
 
   computed: {
-    commentString() {
-      return _.find(this.comment.fields, { attribute: "comment" }).value;
+    noteString() {
+      return _.find(this.note.fields, { attribute: "content" }).value;
+    },
+    noteType() {
+      return _.find(this.note.fields, { attribute: "type" }).value || "note";
     },
 
-    commenter() {
-      return _.find(this.comment.fields, { attribute: "commenter" }).value;
+    user() {
+      return _.find(this.note.fields, { attribute: "user" }).value;
     },
 
-    commenterUrl() {
-      let commenterId = _.find(this.comment.fields, { attribute: "commenter" })
-        .belongsToId;
+    userUrl() {
+      let userId = _.find(this.note.fields, { attribute: "user" }).belongsToId;
 
-      return `/nova/resources/users/${commenterId}`;
+      return `/nova/resources/users/${userId}`;
     },
 
     date() {
       let now = moment();
       let date = moment
-        .utc(_.find(this.comment.fields, { attribute: "created_at" }).value)
+        .utc(_.find(this.note.fields, { attribute: "created_at" }).value)
         .tz(moment.tz.guess());
 
       if (date.isSame(now, "minute")) {
@@ -77,8 +79,8 @@ export default {
       return `on ${date.format("ll")}`;
     },
 
-    hasCommenter() {
-      return Boolean(this.commenter);
+    hasUser() {
+      return Boolean(this.user);
     },
   },
 };

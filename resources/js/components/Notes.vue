@@ -1,25 +1,37 @@
 <template>
   <div>
     <h4 class="text-90 font-normal text-2xl mb-3">
-      Comments
+      Notes
     </h4>
 
     <div class="card mb-6 overflow-hidden">
       <div class="flex border-b border-40 remove-bottom-border px-8">
         <div class="w-full pt-6 pb-2">
           <h4 class="font-normal text-80">
-            Write new comment
+            Write new note
           </h4>
-
+          <select-control
+            v-model="type"
+            :options="[
+            {
+                label: 'Note',
+                value: 'note'
+            },
+            {
+                label: 'Innapropriate',
+                value: 'innapropriate'
+            }
+          ]"
+          />
           <textarea
             class="w-full form-control form-input form-input-bordered py-3 h-auto mt-2"
-            id="commenter"
-            dusk="commenter"
+            id="user"
+            dusk="user"
             rows="5"
-            v-model="comment"
-            @keyup.enter.93="createComment"
+            v-model="note"
+            @keyup.enter.93="createNote"
           >
-                    </textarea>
+        </textarea>
         </div>
       </div>
 
@@ -31,24 +43,24 @@
         <button
           class="btn btn-default btn-primary inline-flex items-center relative mt-4"
           type="submit"
-          @click="createComment"
+          @click="createNote"
         >
-          Save Comment
+          Save Note
         </button>
       </div>
 
       <div
         class="flex border-b border-40 remove-bottom-border px-8"
-        v-if="hasComments"
+        v-if="hasNotes"
       >
         <div class="w-full py-6">
-          <h3 class="text-90 font-bold text-lg mb-4">Comments</h3>
+          <h3 class="text-90 font-bold text-lg mb-4">Notes</h3>
 
-          <comment
-            v-for="(comment, key) in data.resources"
-            :comment="comment"
+          <comment-note
+            v-for="(note, key) in data.resources"
+            :note="note"
             :key="key"
-          ></comment>
+          ></comment-note>
         </div>
       </div>
 
@@ -61,7 +73,7 @@
             class="btn btn-link py-3 px-4"
             :class="paginationClass(hasNextLink)"
             :disabled="! hasNextLink"
-            @click="getComments(data.next_page_url)"
+            @click="getNotes(data.next_page_url)"
           >
             Older
           </button>
@@ -70,7 +82,7 @@
             class="btn btn-link py-3 px-4"
             :class="paginationClass(hasPrevLink)"
             :disabled="! hasPrevLink"
-            @click="getComments(data.prev_page_url)"
+            @click="getNotes(data.prev_page_url)"
           >
             Newer
           </button>
@@ -81,17 +93,26 @@
 </template>
 
 <script>
-import Comment from "./Comment";
+import SelectControl from "../../../vendor/laravel/nova/resources/js/components/Controls/SelectControl.vue";
+import CommentNote from "./CommentNote";
 
 export default {
-  props: ["resourceName", "resourceId", "field"],
+  props: {
+    resourceName: {
+      type: String,
+      default: "\\KirschbaumDevelopment\\NovaComments\\Nova\\Note",
+    },
+    resourceId: [Number, String],
+    field: [Object],
+  },
 
-  components: { Comment },
+  components: { CommentNoteSelectControl },
 
   data() {
     return {
-      baseCommentUri: "/nova-api/comments",
-      comment: "",
+      baseNoteUri: "/nova-api/comment-notes",
+      note: "",
+      type: "note",
       data: {
         next_page_url: "",
         prev_page_url: "",
@@ -101,15 +122,15 @@ export default {
   },
 
   mounted() {
-    this.getComments(this.commentsUri);
+    this.getNotes(this.notesUri);
   },
 
   computed: {
-    commentsUri() {
-      return `${this.baseCommentUri}?page=1`;
+    notesUri() {
+      return `${this.baseNoteUri}?page=1`;
     },
 
-    hasComments() {
+    hasNotes() {
       return Boolean(this.data.resources.length);
     },
 
@@ -126,38 +147,39 @@ export default {
     },
 
     queryParams() {
-      return `&orderBy=created_at&orderByDirection=desc&viaResource=${this.resourceName}&viaResourceId=${this.resourceId}&viaRelationship=comments&relationshipType=hasMany`;
+      return `&orderBy=created_at&orderByDirection=desc&viaResource=${this.resourceName}&viaResourceId=${this.resourceId}&viaRelationship=notes&relationshipType=hasMany`;
     },
   },
 
   methods: {
-    createComment() {
-      if (!this.comment) {
+    createNote() {
+      if (!this.note) {
         return false;
       }
 
       let payload = {
-        comment: this.comment,
+        content: this.note,
+        type: this.type,
         viaResource: this.resourceName,
         viaResourceId: this.resourceId,
-        viaRelationship: "comments",
+        viaRelationship: "notes",
       };
 
       axios
-        .post(this.baseCommentUri, payload)
+        .post(this.baseNoteUri, payload)
         .then(() => {
-          this.getComments(this.commentsUri);
+          this.getNotes(this.notesUri);
 
-          this.resetComment();
+          this.resetNote();
 
-          this.$toasted.show(`A new comment has been created.`, {
+          this.$toasted.show(`A new note has been created.`, {
             type: "success",
           });
         })
         .catch((response) => this.$toasted.show(response, { type: "error" }));
     },
 
-    getComments(uri) {
+    getNotes(uri) {
       axios
         .get(`${uri}${this.queryParams}`)
         .then(({ data }) => (this.data = data));
@@ -167,8 +189,8 @@ export default {
       return isActive ? "text-primary dim" : "text-80 opacity-50";
     },
 
-    resetComment() {
-      this.comment = "";
+    resetNote() {
+      this.note = "";
     },
   },
 };

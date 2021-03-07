@@ -5,6 +5,7 @@ namespace KirschbaumDevelopment\NovaComments;
 use Laravel\Nova\Nova;
 use Illuminate\Support\ServiceProvider;
 use KirschbaumDevelopment\NovaComments\Nova\Comment;
+use KirschbaumDevelopment\NovaComments\Nova\Note;
 
 class NovaCommentsServiceProvider extends ServiceProvider
 {
@@ -51,7 +52,7 @@ class NovaCommentsServiceProvider extends ServiceProvider
      */
     protected function nova()
     {
-        Nova::resources([Comment::class]);
+        Nova::resources([Comment::class, Note::class]);
 
         Nova::serving(
             function () {

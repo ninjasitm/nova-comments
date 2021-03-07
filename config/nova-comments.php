@@ -1,6 +1,13 @@
 <?php
 
 return [
+    // Supports approval. Enable to support approval functionality on backend
+    'supports-approval' => false,
+
+    // Custom class to use for package
+    'comment-class' => \KirschbaumDevelopment\NovaComments\Models\Comment::class,
+    'note-class' => \KirschbaumDevelopment\NovaComments\Models\Note::class,
+
     // Sets whether or not Comments should show up in sidebar navigation.
     'available-for-navigation' => true,
 

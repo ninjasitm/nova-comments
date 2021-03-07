@@ -2,8 +2,6 @@
 
 namespace KirschbaumDevelopment\NovaComments;
 
-use KirschbaumDevelopment\NovaComments\Models\Comment;
-
 trait Commentable
 {
     /**
@@ -11,6 +9,13 @@ trait Commentable
      */
     public function comments()
     {
-        return $this->morphMany(Comment::class, 'commentable');
+        return $this->morphMany(config('nova-comments.comments-model'), 'commentable');
+    }
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\MorphMany
+     */
+    public function flaggedComments()
+    {
+        return $this->comments()->whereHas('notesFlaggedAsInappropriate');
     }
 }

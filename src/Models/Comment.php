@@ -44,4 +44,20 @@ class Comment extends Model
     {
         return $this->belongsTo(config('auth.providers.users.model'), 'commenter_id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notes()
+    {
+        return $this->hasMany(config('nova-comments.note-model'), 'commenter_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notesFlaggedAsInappropriate()
+    {
+        return $this->notes()->whereIn('type', ['inappropriate']);
+    }
 }
