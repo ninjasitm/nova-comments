@@ -24,7 +24,7 @@ class Comment extends Model implements ContractsComment
         static::creating(
             function ($comment) {
                 if (auth()->check()) {
-                    $comment->commenter_id = auth()->id();
+                    $comment->commenter_id = $comment->commenter_id ?? auth()->id();
                 }
             }
         );

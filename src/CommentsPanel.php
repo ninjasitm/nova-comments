@@ -11,9 +11,9 @@ class CommentsPanel extends Panel
     /**
      * Create a new panel instance.
      */
-    public function __construct()
+    public function __construct($name = "Comments")
     {
-        parent::__construct('Comments', $this->prepareFields($this->fields()));
+        parent::__construct($name, $this->prepareFields($this->fields()));
     }
 
     /**

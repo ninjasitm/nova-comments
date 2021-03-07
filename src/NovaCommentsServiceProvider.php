@@ -52,6 +52,9 @@ class NovaCommentsServiceProvider extends ServiceProvider
      */
     protected function nova()
     {
+        Comment::$model = config('nova-comments.comment-class', \KirschbaumDevelopment\NovaComments\Models\Comment::class);
+        Note::$model = config('nova-comments.note-class', \KirschbaumDevelopment\NovaComments\Models\Note::class);
+
         Nova::resources([Comment::class, Note::class]);
 
         Nova::serving(

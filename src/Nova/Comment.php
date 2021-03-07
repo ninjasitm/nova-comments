@@ -7,12 +7,13 @@ use Laravel\Nova\Resource;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Laravel\Nova\Fields\Text;
+use Laravel\Nova\Fields\Boolean;
 use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Fields\DateTime;
 use Laravel\Nova\Fields\Textarea;
 use Laravel\Nova\Fields\BelongsTo;
-use Laravel\Nova\Fields\Boolean;
 use Whitecube\NovaFlexibleContent\Flexible;
+use KirschbaumDevelopment\NovaNotes\CommentNotes;
 use KirschbaumDevelopment\NovaComments\Models\Comment as CommentModel;
 
 class Comment extends Resource
@@ -41,6 +42,18 @@ class Comment extends Resource
     ];
 
     /**
+     * Create a new resource instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $resource
+     * @return void
+     */
+    public function __construct($resource)
+    {
+        $this->resource = $resource;
+        Comment::$model = config('nova-comment.comment-class', static::$model);
+    }
+
+    /**
      * Get the fields displayed by the resource.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -50,13 +63,13 @@ class Comment extends Resource
     public function fields(Request $request)
     {
         $fields = [
-            Textarea::make('comment')
+            Textarea::make('Comment')
                 ->alwaysShow()
                 ->hideFromIndex(),
 
             MorphTo::make('Commentable')->onlyOnIndex(),
 
-            Text::make('comment')
+            Text::make('Comment')
                 ->displayUsing(function ($comment) {
                     return Str::limit($comment, config('nova-comments.limit'));
                 })
@@ -85,7 +98,7 @@ class Comment extends Resource
     protected function moderationPanel()
     {
         $fields = [
-            HasMany::make("notes")
+            new CommentNotes("Notes")
         ];
         return $fields;
     }

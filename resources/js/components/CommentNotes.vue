@@ -106,7 +106,7 @@ export default {
     field: [Object],
   },
 
-  components: { CommentNoteSelectControl },
+  components: { CommentNote, SelectControl },
 
   data() {
     return {

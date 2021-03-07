@@ -1,4 +1,4 @@
-Nova.booting((Vue) => {
+Nova.booting(Vue => {
     Vue.component("commenter", require("./components/Tool"));
-    Vue.component("commenter-notes", require("./components/Notes"));
+    Vue.component("comment-notes", require("./components/CommentNotes"));
 });

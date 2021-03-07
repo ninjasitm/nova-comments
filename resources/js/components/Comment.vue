@@ -1,28 +1,46 @@
 <template>
   <div class="commenter__comment py-4 border-t border-40">
-    <div class="font-light text-80 text-sm">
-      <template v-if="hasCommenter">
-        <a
-          class="no-underline dim text-primary font-bold"
-          :href="commenterUrl"
-          v-text="commenter"
-        ></a>
+    <div class="flex font-light text-80 text-sm">
+      <div class="col">
+        <template v-if="hasCommenter">
+          <a
+            class="no-underline dim text-primary font-bold"
+            :href="commenterUrl"
+            v-text="commenter"
+          ></a>
 
-        said
-      </template>
+          said
+        </template>
 
-      <template v-else>
-        Written
-      </template>
+        <template v-else>
+          Written
+        </template>
 
-      {{ date }}
+        {{ date }}
+      </div>
+      <div class="col">
+        <button
+          type="button"
+          @keydown.enter.prevent="showNotes = !showNotes"
+          @click.prevent="showNotes = !showNotes"
+          tabindex="0"
+          class="cursor-pointer dim btn btn-link text-primary inline-flex items-center"
+        >
+          <icon
+            type="view"
+            view-box="0 0 20 20"
+            width="16"
+            height="16"
+          /> Notes
+        </button>
+      </div>
     </div>
 
     <div
       class="mt-2"
       v-html="commentString"
     ></div>
-    <commenter-notes
+    <comment-notes
       v-if="showNotes"
       :resource-id="comment.id"
     />

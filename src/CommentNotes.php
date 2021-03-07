@@ -1,10 +1,10 @@
 <?php
 
-namespace KirschbaumDevelopment\NovaComments;
+namespace KirschbaumDevelopment\NovaNotes;
 
 use Laravel\Nova\ResourceTool;
 
-class Commenter extends ResourceTool
+class CommentNotes extends ResourceTool
 {
     /**
      * The number of resources to show per page via relationships.
@@ -14,13 +14,13 @@ class Commenter extends ResourceTool
     public static $perPageViaRelationship = 25;
 
     /**
-     * Create a new Commenter resource tool instance.
+     * Create a new Noteer resource tool instance.
      *
      * @param string $name
      *
      * @return void
      */
-    public function __construct($name = 'Comments')
+    public function __construct($name = 'Notes')
     {
         $this->name = $name;
 
@@ -34,6 +34,6 @@ class Commenter extends ResourceTool
      */
     public function component()
     {
-        return 'commenter';
+        return 'comment-notes';
     }
 }

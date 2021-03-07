@@ -36,6 +36,25 @@ class Note extends Resource
     ];
 
     /**
+     * Indicates if the resource should be displayed in the sidebar.
+     *
+     * @var bool
+     */
+    public static $displayInNavigation = false;
+
+    /**
+     * Create a new resource instance.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|null  $resource
+     * @return void
+     */
+    public function __construct($resource)
+    {
+        $this->resource = $resource;
+        Comment::$model = config('nova-comments.note-class', static::$model);
+    }
+
+    /**
      * Get the fields displayed by the resource.
      *
      * @param  \Illuminate\Http\Request  $request
