@@ -3,8 +3,9 @@
 namespace KirschbaumDevelopment\NovaComments\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use KirschbaumDevelopment\NovaComments\Contracts\Comment as ContractsComment;
 
-class Comment extends Model
+class Comment extends Model implements ContractsComment
 {
     /**
      * The table associated with the model.

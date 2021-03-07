@@ -4,8 +4,9 @@ namespace KirschbaumDevelopment\NovaComments\Models;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use KirschbaumDevelopment\NovaComments\Contracts\Note as ContractsNote;
 
-class Note extends Model
+class Note extends Model implements ContractsNote
 {
     // Comment flags
     const FLAG_DEFAULT = 'note';
