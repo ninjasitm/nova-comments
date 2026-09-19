@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <section>
         <h4 class="text-90 font-normal text-2xl mb-3">
             Comments
         </h4>
@@ -46,24 +46,24 @@
                     <button class="btn btn-link py-3 px-4"
                         :class="paginationClass(hasNextLink)"
                         :disabled="! hasNextLink"
-                        @click="getComments(data.next_page_url)">
+                        @click="getComments(data.nextPageUrl)">
                         Older
                     </button>
 
                     <button class="btn btn-link py-3 px-4"
                         :class="paginationClass(hasPrevLink)"
                         :disabled="! hasPrevLink"
-                        @click="getComments(data.prev_page_url)">
+                        @click="getComments(data.prevPageUrl)">
                         Newer
                     </button>
                 </nav>
             </div>
         </div>
-    </div>
+    </section>
 </template>
 
 <script>
-    import Comment from './Comment';
+    import Comment from './Comment.vue'
 
     export default {
         props: ['resourceName', 'resourceId', 'field'],
@@ -75,9 +75,9 @@
                 baseCommentUri: '/nova-api/comments',
                 comment: '',
                 data: {
-                    next_page_url: '',
-                    prev_page_url: '',
-                    resources: {}
+                    nextPageUrl: '',
+                    prevPageUrl: '',
+                    resources: []
                 }
             }
         },
@@ -88,7 +88,7 @@
 
         computed: {
             commentsUri() {
-                return `${this.baseCommentUri}?page=1`;
+                return this.withRelationshipQuery(`${this.baseCommentUri}?page=1`)
             },
 
             hasComments() {
@@ -96,11 +96,11 @@
             },
 
             hasNextLink() {
-                return Boolean(this.data.next_page_url);
+                return Boolean(this.data.nextPageUrl);
             },
 
             hasPrevLink() {
-                return Boolean(this.data.prev_page_url);
+                return Boolean(this.data.prevPageUrl);
             },
 
             hasPagination() {
@@ -108,7 +108,14 @@
             },
 
             queryParams() {
-                return `&orderBy=created_at&orderByDirection=desc&viaResource=${this.resourceName}&viaResourceId=${this.resourceId}&viaRelationship=comments&relationshipType=hasMany`;
+                return {
+                    orderBy: 'created_at',
+                    orderByDirection: 'desc',
+                    viaResource: this.resourceName,
+                    viaResourceId: this.resourceId,
+                    viaRelationship: 'comments',
+                    relationshipType: 'hasMany',
+                }
             }
         },
 
@@ -118,27 +125,36 @@
                     return false;
                 }
 
-                let payload = {
+                const payload = {
                     comment: this.comment,
                     viaResource: this.resourceName,
                     viaResourceId: this.resourceId,
                     viaRelationship: 'comments',
                 };
 
-                axios.post(this.baseCommentUri, payload)
+                Nova.request().post(this.baseCommentUri, payload)
                     .then(() => {
                         this.getComments(this.commentsUri);
 
                         this.resetComment();
 
-                        this.$toasted.show(`A new comment has been created.`, { type: 'success' });
+                        Nova.success('A new comment has been created.')
                     })
-                    .catch(response => this.$toasted.show(response, { type: 'error' }));
+                    .catch(() => Nova.error('Unable to create comment.'))
             },
 
             getComments(uri) {
-                axios.get(`${uri}${this.queryParams}`)
-                    .then(({ data }) => this.data = data);
+                Nova.request().get(this.withRelationshipQuery(uri))
+                    .then(({ data }) => this.data = data)
+                    .catch(() => Nova.error('Unable to load comments.'))
+            },
+
+            withRelationshipQuery(uri) {
+                const url = new URL(uri, window.location.origin)
+
+                Object.entries(this.queryParams).forEach(([key, value]) => url.searchParams.set(key, value))
+
+                return `${url.pathname}${url.search}`
             },
 
             paginationClass(isActive) {

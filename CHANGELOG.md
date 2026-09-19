@@ -2,6 +2,14 @@
 
 All notable changes to `nova-comments` will be documented in this file
 
+## 2.0.0-rc.1 - 2026-09-19
+
+- Breaking: require PHP 8.4, Laravel 13, and Nova 5.
+- Migrate the inline tool to Vue 3 and Laravel Mix 6; modernize Nova resource, API, and commenter-auth integration.
+- Preserve the historical `nova_comments` schema and existing data shape; add package contracts and fixture coverage.
+- Document that raw comment HTML remains trusted-content-only and carries stored-XSS risk.
+- This is a prerelease; host-browser smoke testing is not claimed.
+
 ## 1.0.0 - 2019-04-23
 
 - Initial release

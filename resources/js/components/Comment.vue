@@ -19,8 +19,6 @@
 </template>
 
 <script>
-    // require('moment-timezone');
-
     export default {
         props: {
             comment: {
@@ -31,41 +29,38 @@
 
         computed: {
             commentString() {
-                return _.find(this.comment.fields, { attribute: 'comment' }).value;
+                return this.field('comment')?.value ?? ''
             },
 
             commenter() {
-                return _.find(this.comment.fields, { attribute: 'commenter' }).value;
+                return this.field('commenter')?.value ?? ''
             },
 
             commenterUrl() {
-                let commenterId = _.find(this.comment.fields, { attribute: 'commenter' }).belongsToId;
+                const commenter = this.field('commenter')
 
-                return `/nova/resources/users/${commenterId}`;
+                return commenter?.belongsToId && commenter.resourceName
+                    ? Nova.url(`/resources/${commenter.resourceName}/${commenter.belongsToId}`)
+                    : null
             },
 
             date() {
-                let now = moment();
-                let date = moment.utc(_.find(this.comment.fields, { attribute: 'created_at' }).value)
-                    .tz(moment.tz.guess());
+                const date = new Date(this.field('created_at')?.value)
 
-                if (date.isSame(now, 'minute')) {
-                    return 'just now';
-                }
-
-                if (date.isSame(now, 'day')) {
-                    return `at ${date.format('LT')}`;
-                }
-
-                if (date.isSame(now, 'year')) {
-                    return `on ${date.format('MMM D')}`;
-                }
-
-                return `on ${date.format('ll')}`;
+                return Number.isNaN(date.getTime()) ? '' : `on ${new Intl.DateTimeFormat(undefined, {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                }).format(date)}`
             },
 
             hasCommenter() {
                 return Boolean(this.commenter);
+            }
+        },
+
+        methods: {
+            field(attribute) {
+                return this.comment.fields.find((field) => field.attribute === attribute)
             }
         }
     }

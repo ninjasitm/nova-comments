@@ -2,9 +2,10 @@
 
 namespace KirschbaumDevelopment\NovaComments\Nova;
 
-use App\Nova\Resource;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Laravel\Nova\Nova;
+use Laravel\Nova\Resource;
 use Laravel\Nova\Fields\Text;
 use Laravel\Nova\Fields\MorphTo;
 use Laravel\Nova\Fields\DateTime;
@@ -48,6 +49,7 @@ class Comment extends Resource
     {
         return [
             Textarea::make('comment')
+                ->rules('required', 'string')
                 ->alwaysShow()
                 ->hideFromIndex(),
 
@@ -59,11 +61,10 @@ class Comment extends Resource
                 })
                 ->onlyOnIndex(),
 
-            BelongsTo::make('Commenter', 'commenter', config('nova-comments.commenter.nova-resource'))
+            BelongsTo::make('Commenter', 'commenter', $this->commenterResource())
                 ->exceptOnForms(),
 
             DateTime::make('Created', 'created_at')
-                ->format(config('nova-comments.date-format'))
                 ->exceptOnForms()
                 ->sortable(),
         ];
@@ -127,5 +128,11 @@ class Comment extends Resource
     public static function availableForNavigation(Request $request)
     {
         return config('nova-comments.available-for-navigation');
+    }
+
+    protected function commenterResource(): ?string
+    {
+        return config('nova-comments.commenter.nova-resource')
+            ?: Nova::resourceForModel(config('auth.providers.users.model'));
     }
 }

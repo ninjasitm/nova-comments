@@ -4,9 +4,9 @@ return [
     // Sets whether or not Comments should show up in sidebar navigation.
     'available-for-navigation' => true,
 
-    // The resource to use as a commenter. Typically the User resource.
+    // Optionally override the Nova resource used for the configured auth provider model.
     'commenter' => [
-        'nova-resource' => \App\Nova\User::class,
+        'nova-resource' => null,
     ],
 
     // Configs for the comments panel

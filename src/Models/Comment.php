@@ -13,6 +13,8 @@ class Comment extends Model
      */
     protected $table = 'nova_comments';
 
+    protected $fillable = ['comment'];
+
     /**
      * The "booting" method of the model.
      */

@@ -14,7 +14,7 @@ This package contains an inline commenting form for any resource to easily add c
 
 ## Requirements
 
-This Nova resource tool requires Nova 2.0 or higher.
+This is the backward-incompatible v2 major line and requires PHP 8.4, Laravel 13, and Nova 5.
 
 ## Installation
 
@@ -33,7 +33,7 @@ php artisan migrate
 And lastly, any model that you want to have comments needs the `Commentable` trait added to it.
 
 ```php
-use KirschbaumDevelopment\Novacomments\Commentable;
+use KirschbaumDevelopment\NovaComments\Commentable;
 
 class Post extends Model
 {
@@ -50,7 +50,11 @@ php artisan vendor:publish
 ```
 And choose the provider for this package: `KirschbaumDevelopment\NovaComments\NovaCommentsServiceProvider`
 
-This package requires that it has a commenter, which is simply a `User`. Nova Comments automatically defaults to the `App\Nova\User` resource, but can easily be changed in the publishable config file.
+Comments use the model configured by `auth.providers.users.model`. Nova Comments resolves that model's registered Nova resource automatically. Set `nova-comments.commenter.nova-resource` only when an explicit resource override is needed.
+
+### Trusted content warning
+
+**Trusted content only:** comment bodies are rendered as raw HTML to preserve existing behavior. Untrusted authors can create stored XSS; restrict comment creation to trusted users or sanitize content before it is stored.
 
 ## Usage
 
@@ -93,7 +97,7 @@ As a convenience, a prebuilt comments panel has been created for you. All you ne
 ```php
 namespace App\Nova;
 
-use KirschbaumDevelopment\NovaComments\Commenter;
+use KirschbaumDevelopment\NovaComments\CommentsPanel;
 
 class Post extends Resource
 {
